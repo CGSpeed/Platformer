@@ -15,10 +15,13 @@ public class NewMonoBehaviourScript : MonoBehaviour
     private float moveInput;
     private bool isGrounded;
 
+    private Animator animator;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         input = new PlayerInputActions();
+        animator = GetComponent<Animator>();
     }
 
     void OnEnable()
@@ -39,11 +42,12 @@ public class NewMonoBehaviourScript : MonoBehaviour
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
 
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
+
+        SetAnimation(moveInput);
     }
 
     void Jump()
     {
-        Debug.Log("Jump pressed");
         if (!isGrounded) return;
 
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
@@ -57,6 +61,32 @@ public class NewMonoBehaviourScript : MonoBehaviour
         if (groundCheck == null) return;
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
+    }
+
+    private void SetAnimation(float moveInput)
+    {
+        if (isGrounded)
+        {
+            if (moveInput == 0)
+            {
+                animator.Play("Player_Idle");
+            }
+            else
+            {
+                animator.Play("Player_Run");
+            }
+        }
+        else
+        {
+            if (rb.linearVelocity.y > 0)
+            {
+                animator.Play("Player_Jump");
+            }
+            else
+            {
+                animator.Play("Player_Fall");
+            }
+        }
     }
 }
 
